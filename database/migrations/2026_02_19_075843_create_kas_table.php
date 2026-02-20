@@ -17,8 +17,15 @@ return new class extends Migration
             $table->enum('jenis_transaksi',['masuk','keluar']);
             $table->string('kategori_transaksi');
             $table->decimal('jumlah',15,2);
-            $table->string('referensi')->nullable();
-            $table->string('keterangan');
+            #sebagai refernsi_id
+            $table->foreignId('produksi_id')->nullable()
+                                            ->references('id')
+                                            ->on('produksis');
+            $table->foreignId('penjualan_id')->nullable()
+                                            ->references('id')
+                                            ->on('penjualans');
+
+            $table->string('keterangan')->nullable();
             $table->timestamps();
         });
     }

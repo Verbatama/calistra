@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('produksis', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')
+                  ->references('id')->on('users');
             $table->date('tanggal');
             $table->string('kode_produksi');
             $table->foreignId('barang_id')->references('id')
