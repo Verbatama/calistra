@@ -10,7 +10,7 @@ class DetailProduksi extends Model
         'produksi_id',
         'bahan_id',
         'qty_bahan',
-        'biaya'
+        'biaya',
 
     ];
 }

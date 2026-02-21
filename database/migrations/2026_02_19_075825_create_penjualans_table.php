@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('penjualans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
-                  ->references('id')->on('users');
+                ->references('id')->on('users');
             $table->date('tanggal');
             $table->string('kode_penjualan');
             $table->timestamps();

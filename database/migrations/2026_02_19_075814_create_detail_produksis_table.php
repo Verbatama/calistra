@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('detail_produksis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('produksi_id')->references('id')
-                                            ->on('produksis');
+                ->on('produksis');
             $table->foreignId('bahan_id')->references('id')
-                                         ->on('bahan_bakus');
+                ->on('bahan_bakus');
             $table->integer('qty_bahan')->unsigned();
-            $table->decimal('biaya',15,2);
+            $table->decimal('biaya', 15, 2);
             $table->timestamps();
         });
     }

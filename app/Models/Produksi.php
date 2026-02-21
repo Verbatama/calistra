@@ -11,7 +11,7 @@ class Produksi extends Model
         'tanggal',
         'kode_produksi',
         'barang_id',
-        'quantity_pcs'
+        'quantity_pcs',
 
     ];
 }

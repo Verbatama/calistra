@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('detail_penjualans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('penjualan_id')
-                  ->references('id')->on('penjualans');
+                ->references('id')->on('penjualans');
             $table->foreignId('barang_id')
-                  ->references('id')->on('barangs');
+                ->references('id')->on('barangs');
             $table->integer('jumlah')->unsigned();
-            $table->decimal('harga_jual',15,2);
-            $table->decimal('subtotal',15,2);
+            $table->decimal('harga_jual', 15, 2);
+            $table->decimal('subtotal', 15, 2);
             $table->timestamps();
         });
     }

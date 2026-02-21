@@ -13,7 +13,7 @@ class Kas extends Model
         'jumlah',
         'produksi_id',
         'penjualan_id',
-        'keterangan'
+        'keterangan',
 
     ];
 }

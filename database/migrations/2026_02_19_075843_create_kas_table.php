@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('kas', function (Blueprint $table) {
             $table->id();
             $table->date('tanggal');
-            $table->enum('jenis_transaksi',['masuk','keluar']);
+            $table->enum('jenis_transaksi', ['masuk', 'keluar']);
             $table->string('kategori_transaksi');
-            $table->decimal('jumlah',15,2);
-            #sebagai refernsi_id
+            $table->decimal('jumlah', 15, 2);
+            // sebagai refernsi_id
             $table->foreignId('produksi_id')->nullable()
-                                            ->references('id')
-                                            ->on('produksis');
+                ->references('id')
+                ->on('produksis');
             $table->foreignId('penjualan_id')->nullable()
-                                            ->references('id')
-                                            ->on('penjualans');
+                ->references('id')
+                ->on('penjualans');
 
             $table->string('keterangan')->nullable();
             $table->timestamps();

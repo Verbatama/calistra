@@ -11,6 +11,6 @@ class DetailPenjualan extends Model
         'barang_id',
         'jumlah',
         'harga_jual',
-        'subtotal'
+        'subtotal',
     ];
 }

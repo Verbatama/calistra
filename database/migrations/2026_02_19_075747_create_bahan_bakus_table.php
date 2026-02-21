@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_bahan');
             $table->string('satuan');
-            $table->decimal('harga_satuan',15,2);
+            $table->decimal('harga_satuan', 15, 2);
             $table->timestamps();
         });
     }
