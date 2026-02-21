@@ -11,7 +11,7 @@ class ApiController extends Controller
     protected function success($data, string $message='success', int $code=200, $meta=null):JsonResponse
     {
         $response = [
-            'succes'=> true,
+            'success'=> true,
             'message'=> $message,
             'data'=>$data,
 
@@ -29,7 +29,7 @@ class ApiController extends Controller
     protected function error(string $message='Something went wrong', int $code=400):JsonResponse
     {
         $response = [
-            'succes' => true,
+            'success' => false,
             'message'=>$message,
             'data'=>null,
         ];

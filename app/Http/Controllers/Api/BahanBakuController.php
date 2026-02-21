@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BahanBaku;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\Model;
 
 
 class BahanBakuController extends ApiController
@@ -16,12 +14,12 @@ class BahanBakuController extends ApiController
         $limit = (int) $request->get('limit',10);
         $bahan_bakus = BahanBaku::paginate($limit);
 
-        return $this->success(null);
+        return $this->success($bahan_bakus);
     }
 
     public function show($id){
         $bahan_baku = BahanBaku::findOrFail($id);
-        return $this->success(null);
+        return $this->success($bahan_baku);
     }
 
     public function store(Request $request){
@@ -32,7 +30,7 @@ class BahanBakuController extends ApiController
         ]);
 
         $bahan_baku = BahanBaku::create($validator->validate());
-        return $this->success(null);
+        return $this->success($bahan_baku, 'Data bahan baku berhasil disimpan', 201);
     }
 
     public function update(Request $request, $id){
@@ -43,16 +41,16 @@ class BahanBakuController extends ApiController
             'harga_satuan' => 'sometimes|required|numeric',
         ]);
 
-        $bahan_baku = BahanBaku::updated($validator->validate());
+        $bahan_baku->update($validator->validate());
 
-        return $this->success(null);
+        return $this->success($bahan_baku->fresh(), 'Data bahan baku berhasil diperbarui');
     }
 
     public function destroy($id){
 
         $bahan_baku = BahanBaku::findOrFail($id);
         $bahan_baku->delete();
-        return $this->success(null);
+        return $this->success(null, 'Data bahan baku berhasil dihapus');
 
     }
 }
