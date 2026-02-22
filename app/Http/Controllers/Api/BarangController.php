@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Barang;
+use App\Http\Resources\BarangResource;
 
 class BarangController extends ApiController
 {
@@ -12,13 +13,13 @@ class BarangController extends ApiController
         $limit = (int) $request->get('limit',10);
         $barangs = Barang::paginate($limit);
 
-        return $this->success($barangs);
+        return $this->success(BarangResource::collection($barangs)->resolve());
 
     }
 
     public function show($id){
         $barang = Barang::findOrFail($id);
-        return $this->success($barang);
+        return $this->success((new BarangResource($barang))->resolve());
     }
 
     public function store(Request $request){
@@ -29,7 +30,7 @@ class BarangController extends ApiController
         ]);
 
         $barang = Barang::create($validator->validate());
-        return $this->success($barang, 'Data barang berhasil disimpan', 201);
+        return $this->success((new BarangResource($barang))->resolve(), 'Data barang berhasil disimpan', 201);
 
     }
 
@@ -42,7 +43,7 @@ class BarangController extends ApiController
         ]);
 
         $barang->update($validator->validate());
-        return $this->success($barang->fresh(), 'Data barang berhasil diperbarui');
+        return $this->success((new BarangResource($barang))->resolve(), 'Data barang berhasil diperbarui');
 
     }
 

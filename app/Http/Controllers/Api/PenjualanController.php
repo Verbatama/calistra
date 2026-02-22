@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\DetailPenjualan;
 use App\Models\Kas;
 use App\Models\Penjualan;
+use App\Http\Resources\PenjualanResource;
 
 class PenjualanController extends ApiController
 {
@@ -22,26 +23,26 @@ class PenjualanController extends ApiController
         }
 
         $penjualan = $query->get();
-        return $this->success($penjualan);
+        return $this->success(PenjualanResource::collection($penjualan)->resolve());
 
     }
 
     public function show($id){
         $penjualan = Penjualan::with(['detailPenjualan.barang'],
                     'user')->findOrFail($id);
-        return $this->success($penjualan);
+        return $this->success((new PenjualanResource($penjualan))->resolve());
     }
 
     public function store(Request $request){
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
-            'tanggal' => 'nullable|date',
-            'kode_penjualan' => 'nullable|string|max:255',
+            'tanggal' => 'required|date',
+            'kode_penjualan' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.barang_id' => 'required|exists:barangs,id',
             'items.*.jumlah' => 'required|integer|min:1',
-            'items.*.harga_jual' => 'nullable|numeric|min:0',
+            'items.*.harga_jual' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -61,14 +62,13 @@ class PenjualanController extends ApiController
             ]);
 
             $total = 0;
-            $detailItems = [];
 
             foreach ($validated['items'] as $item) {
                 $barang = \App\Models\Barang::findOrFail($item['barang_id']);
                 $hargaJual = $item['harga_jual'] ?? $barang->harga;
                 $subtotal = $hargaJual * $item['jumlah'];
 
-                $detail = DetailPenjualan::create([
+                DetailPenjualan::create([
                     'penjualan_id' => $penjualan->id,
                     'barang_id' => $barang->id,
                     'jumlah' => $item['jumlah'],
@@ -76,7 +76,6 @@ class PenjualanController extends ApiController
                     'subtotal' => $subtotal,
                 ]);
 
-                $detailItems[] = $detail;
                 $total += $subtotal;
             }
 
@@ -91,26 +90,9 @@ class PenjualanController extends ApiController
 
             $penjualan->load(['user', 'detailPenjualan.barang']);
 
-            return [
-                'penjualan' => $penjualan,
-                'items' => $detailItems,
-                'total' => $total,
-            ];
+            return (new PenjualanResource($penjualan))->resolve();
         });
 
         return $this->success($result, 'Data penjualan berhasil disimpan', 201);
     }
-
-    public function destroy($id){
-        $penjualan = Penjualan::findOrFail($id);
-
-        DB::transaction(function () use ($penjualan) {
-            Kas::where('penjualan_id', $penjualan->id)->delete();
-            DetailPenjualan::where('penjualan_id', $penjualan->id)->delete();
-            $penjualan->delete();
-        });
-
-        return $this->success(null, 'Data penjualan berhasil dihapus');
-    }
-
 }

@@ -5,18 +5,19 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Kas;
+use App\Http\Resources\KasResource;
 
 class KasController extends ApiController
 {
     public function index(Request $request){
         $limit = (int) $request->get('limit',10 );
         $kass = Kas::with(['produksi', 'penjualan'])->paginate($limit);
-        return $this->success($kass);
+        return $this->success(KasResource::collection($kass)->resolve());
     }
 
     public function show($id){
         $kas = Kas::with(['produksi', 'penjualan'])->findOrFail($id);
-        return $this->success($kas);
+        return $this->success((new KasResource($kas))->resolve());
     }
 
     public function store(Request $request){
@@ -31,7 +32,7 @@ class KasController extends ApiController
         ]);
 
         $kas = Kas::create($validator->validate());
-        return $this->success($kas, 'Data kas berhasil disimpan', 201);
+        return $this->success((new KasResource($kas))->resolve(), 'Data kas berhasil disimpan', 201);
     }
 
 }

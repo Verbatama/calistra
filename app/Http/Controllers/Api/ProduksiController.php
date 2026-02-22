@@ -9,6 +9,7 @@ use App\Models\Produksi as ProduksiModel;
 use App\Models\DetailProduksi;
 use App\Models\BahanBaku;
 use App\Models\Kas;
+use App\Http\Resources\ProduksiResource;
 
 class ProduksiController extends ApiController
 {
@@ -23,27 +24,27 @@ class ProduksiController extends ApiController
 
         $produksis = $query->get();
 
-        return $this->success($produksis);
+        return $this->success(ProduksiResource::collection($produksis)->resolve());
     }
 
     public function show($id){
         $produksi = ProduksiModel::with(['user', 'barang', 'detailProduksi.bahan'])->findOrFail($id);
 
-        return $this->success($produksi);
+        return $this->success((new ProduksiResource($produksi))->resolve());
     }
 
     public function store(Request $request){
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
-            'tanggal' => 'nullable|date',
-            'kode_produksi' => 'nullable|string|max:255',
+            'tanggal' => 'required|date',
+            'kode_produksi' => 'required|string|max:255',
             'barang_id' => 'required|exists:barangs,id',
             'quantity_pcs' => 'required|integer|min:1',
             'keterangan' => 'nullable|string',
             'bahan' => 'required|array|min:1',
             'bahan.*.bahan_id' => 'required|exists:bahan_bakus,id',
             'bahan.*.qty_bahan' => 'required|integer|min:1',
-            'bahan.*.biaya' => 'nullable|numeric|min:0',
+            'bahan.*.biaya' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -65,20 +66,18 @@ class ProduksiController extends ApiController
             ]);
 
             $totalBiaya = 0;
-            $detailBahan = [];
 
             foreach ($validated['bahan'] as $item) {
                 $bahan = BahanBaku::findOrFail($item['bahan_id']);
                 $biaya = $item['biaya'] ?? ($bahan->harga_satuan * $item['qty_bahan']);
 
-                $detail = DetailProduksi::create([
+                DetailProduksi::create([
                     'produksi_id' => $produksi->id,
                     'bahan_id' => $bahan->id,
                     'qty_bahan' => $item['qty_bahan'],
                     'biaya' => $biaya,
                 ]);
 
-                $detailBahan[] = $detail;
                 $totalBiaya += $biaya;
             }
 
@@ -93,29 +92,12 @@ class ProduksiController extends ApiController
 
             $produksi->load(['user', 'barang', 'detailProduksi.bahan']);
 
-            return [
-                'produksi' => $produksi,
-                'details' => $detailBahan,
-                'total_biaya' => $totalBiaya,
-            ];
+            return (new ProduksiResource($produksi))->resolve();
         });
 
         return $this->success($result, 'Data produksi berhasil disimpan', 201);
 
     }
 
-
-    public function destroy($id){
-        $produksi = ProduksiModel::findOrFail($id);
-
-        DB::transaction(function () use ($produksi) {
-            Kas::where('produksi_id', $produksi->id)->delete();
-            DetailProduksi::where('produksi_id', $produksi->id)->delete();
-            $produksi->delete();
-        });
-
-        return $this->success(null, 'Data produksi berhasil dihapus');
-
-    }
 
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Kas extends Model
 {
@@ -16,4 +17,14 @@ class Kas extends Model
         'keterangan',
 
     ];
+
+    public function produksi(): BelongsTo
+    {
+        return $this->belongsTo(Produksi::class);
+    }
+
+    public function penjualan(): BelongsTo
+    {
+        return $this->belongsTo(Penjualan::class);
+    }
 }

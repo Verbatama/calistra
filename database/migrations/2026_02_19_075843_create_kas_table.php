@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -17,17 +18,16 @@ return new class extends Migration
             $table->enum('jenis_transaksi', ['masuk', 'keluar']);
             $table->string('kategori_transaksi');
             $table->decimal('jumlah', 15, 2);
-            // sebagai refernsi_id
             $table->foreignId('produksi_id')->nullable()
-                ->references('id')
-                ->on('produksis');
+                ->constrained('produksis');
             $table->foreignId('penjualan_id')->nullable()
-                ->references('id')
-                ->on('penjualans');
+                ->constrained('penjualans');
 
             $table->string('keterangan')->nullable();
             $table->timestamps();
         });
+
+        DB::statement("ALTER TABLE kas ADD CONSTRAINT kas_jenis_referensi_check CHECK ((jenis_transaksi = 'masuk' AND penjualan_id IS NOT NULL AND produksi_id IS NULL) OR (jenis_transaksi = 'keluar' AND produksi_id IS NOT NULL AND penjualan_id IS NULL))");
     }
 
     /**

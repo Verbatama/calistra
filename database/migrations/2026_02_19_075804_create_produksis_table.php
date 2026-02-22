@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->references('id')->on('users');
             $table->date('tanggal');
-            $table->string('kode_produksi');
+            $table->string('kode_produksi')->unique();
             $table->foreignId('barang_id')->references('id')
                 ->on('barangs');
 

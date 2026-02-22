@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->references('id')->on('users');
             $table->date('tanggal');
-            $table->string('kode_penjualan');
+            $table->string('kode_penjualan')->unique();
             $table->timestamps();
         });
     }
